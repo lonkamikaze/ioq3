@@ -650,9 +650,20 @@ else # ifdef MINGW
 
 ifeq ($(PLATFORM),freebsd)
 
+  # system integration
+  ifndef HOMEPATH
+    HOMEPATH = .ioquake3
+  endif
+
+  ifndef DEFAULT_LIBDIR
+    DEFAULT_LIBDIR = /usr/local/lib/ioquake3
+  endif
+
   # flags
   BASE_CFLAGS = $(shell env MACHINE_ARCH=$(ARCH) make -f /dev/null -VCFLAGS) \
     -Wall -fno-strict-aliasing -Wimplicit -Wstrict-prototypes \
+    -DHOMEPATH=\\\"$(HOMEPATH)\\\" \
+    -DDEFAULT_LIBDIR=\\\"$(DEFAULT_LIBDIR)\\\" \
     -DUSE_ICON -DMAP_ANONYMOUS=MAP_ANON
   CLIENT_CFLAGS += $(SDL_CFLAGS)
   HAVE_VM_COMPILED = true

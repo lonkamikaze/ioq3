@@ -49,6 +49,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 static char binaryPath[ MAX_OSPATH ] = { 0 };
 static char installPath[ MAX_OSPATH ] = { 0 };
+static char libPath[ MAX_OSPATH ] = { 0 };
 
 /*
 =================
@@ -89,6 +90,29 @@ char *Sys_DefaultInstallPath(void)
 {
 	if (*installPath)
 		return installPath;
+	else
+		return Sys_Cwd();
+}
+
+/*
+=================
+Sys_SetDefaultLibPath
+=================
+*/
+void Sys_SetDefaultLibPath(const char *path)
+{
+	Q_strncpyz(libPath, path, sizeof(libPath));
+}
+
+/*
+=================
+Sys_DefaultLibPath
+=================
+*/
+char *Sys_DefaultLibPath(void)
+{
+	if (*libPath)
+		return libPath;
 	else
 		return Sys_Cwd();
 }
@@ -453,7 +477,7 @@ void Sys_UnloadDll( void *dllHandle )
 Sys_LoadDll
 
 First try to load library name from system library path,
-from executable path, then fs_basepath.
+from executable path, then fs_libpath.
 =================
 */
 
@@ -479,7 +503,7 @@ void *Sys_LoadDll(const char *name, qboolean useSystemLib)
 
 		if(!(dllhandle = Sys_LoadLibrary(libPath)))
 		{
-			const char *basePath = Cvar_VariableString("fs_basepath");
+			const char *basePath = Cvar_VariableString("fs_libpath");
 			
 			if(!basePath || !*basePath)
 				basePath = ".";
@@ -572,6 +596,14 @@ void Sys_ParseArgs( int argc, char **argv )
 #	endif
 #endif
 
+#ifndef DEFAULT_LIBDIR
+#	ifdef MACOS_X
+#		define DEFAULT_LIBDIR Sys_StripAppBundle(Sys_BinaryPath())
+#	else
+#		define DEFAULT_LIBDIR Sys_BinaryPath()
+#	endif
+#endif
+
 /*
 =================
 Sys_SigHandler
@@ -655,6 +687,7 @@ int main( int argc, char **argv )
 	Sys_ParseArgs( argc, argv );
 	Sys_SetBinaryPath( Sys_Dirname( argv[ 0 ] ) );
 	Sys_SetDefaultInstallPath( DEFAULT_BASEDIR );
+	Sys_SetDefaultLibPath( DEFAULT_LIBDIR );
 
 	// Concatenate the command line for passing to Com_Init
 	for( i = 1; i < argc; i++ )
