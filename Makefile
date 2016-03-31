@@ -1365,7 +1365,7 @@ makedirs:
 
 ifndef TOOLS_CC
   # A compiler which probably produces native binaries
-  TOOLS_CC = gcc
+  TOOLS_CC = $(CC)
 endif
 
 TOOLS_OPTIMIZE = -g -Wall -fno-strict-aliasing
