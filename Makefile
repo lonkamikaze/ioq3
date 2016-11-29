@@ -648,9 +648,20 @@ else # ifdef MINGW
 
 ifeq ($(PLATFORM),freebsd)
 
+  # system integration
+  ifndef HOMEPATH
+    HOMEPATH = .ioquake3
+  endif
+
+  ifndef DEFAULT_LIBDIR
+    DEFAULT_LIBDIR = /usr/local/lib/ioquake3
+  endif
+
   # flags
   BASE_CFLAGS = $(shell env MACHINE_ARCH=$(ARCH) make -f /dev/null -VCFLAGS) \
     -Wall -fno-strict-aliasing -Wimplicit -Wstrict-prototypes \
+    -DHOMEPATH=\\\"$(HOMEPATH)\\\" \
+    -DDEFAULT_LIBDIR=\\\"$(DEFAULT_LIBDIR)\\\" \
     -DUSE_ICON -DMAP_ANONYMOUS=MAP_ANON
   CLIENT_CFLAGS += $(SDL_CFLAGS)
   HAVE_VM_COMPILED = true
@@ -673,14 +684,14 @@ ifeq ($(PLATFORM),freebsd)
 
   # optional features/libraries
   ifeq ($(USE_OPENAL),1)
-    ifeq ($(USE_OPENAL_DLOPEN),1)
+    ifneq ($(USE_OPENAL_DLOPEN),1)
       CLIENT_LIBS += $(THREAD_LIBS) $(OPENAL_LIBS)
     endif
   endif
 
   ifeq ($(USE_CURL),1)
     CLIENT_CFLAGS += $(CURL_CFLAGS)
-    ifeq ($(USE_CURL_DLOPEN),1)
+    ifneq ($(USE_CURL_DLOPEN),1)
       CLIENT_LIBS += $(CURL_LIBS)
     endif
   endif
@@ -1357,7 +1368,7 @@ makedirs:
 
 ifndef TOOLS_CC
   # A compiler which probably produces native binaries
-  TOOLS_CC = gcc
+  TOOLS_CC = $(CC)
 endif
 
 ifndef YACC
