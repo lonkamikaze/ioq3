@@ -66,6 +66,9 @@ ifeq ($(COMPILE_ARCH),i86pc)
   COMPILE_ARCH=x86
 endif
 
+ifeq ($(COMPILE_ARCH),i386)
+  COMPILE_ARCH=x86
+endif
 ifeq ($(COMPILE_ARCH),amd64)
   COMPILE_ARCH=x86_64
 endif
